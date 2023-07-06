@@ -104,3 +104,8 @@ type CapabilityKeeper interface {
 type ICS20TransferPortSource interface {
 	GetPort(ctx sdk.Context) string
 }
+
+// WormholeKeeper defines a subset of methods implemented by the x/wormhole module keeper
+type WormholeKeeper interface {
+	HasInstantiateAllowlist(ctx sdk.Context, contract string, codeId uint64) bool
+}

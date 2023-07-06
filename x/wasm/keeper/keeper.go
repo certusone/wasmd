@@ -91,6 +91,7 @@ type Keeper struct {
 	bank                  CoinTransferrer
 	portKeeper            types.PortKeeper
 	capabilityKeeper      types.CapabilityKeeper
+	wormholeKeeper        types.WormholeKeeper
 	wasmVM                types.WasmerEngine
 	wasmVMQueryHandler    WasmVMQueryHandler
 	wasmVMResponseHandler WasmVMResponseHandler
@@ -118,6 +119,7 @@ func NewKeeper(
 	portKeeper types.PortKeeper,
 	capabilityKeeper types.CapabilityKeeper,
 	portSource types.ICS20TransferPortSource,
+	wormholeKeeper types.WormholeKeeper,
 	router MessageRouter,
 	_ GRPCQueryRouter,
 	homeDir string,
@@ -143,6 +145,7 @@ func NewKeeper(
 		accountPruner:        NewVestingCoinBurner(bankKeeper),
 		portKeeper:           portKeeper,
 		capabilityKeeper:     capabilityKeeper,
+		wormholeKeeper:       wormholeKeeper,
 		messenger:            NewDefaultMessageHandler(router, channelKeeper, capabilityKeeper, bankKeeper, cdc, portSource),
 		queryGasLimit:        wasmConfig.SmartQueryGasLimit,
 		paramSpace:           paramSpace,
@@ -1080,6 +1083,10 @@ func (k Keeper) importContract(ctx sdk.Context, contractAddr sdk.AccAddress, c *
 	k.addToContractCodeSecondaryIndex(ctx, contractAddr, entries[len(entries)-1])
 	k.addToContractCreatorSecondaryIndex(ctx, creatorAddress, entries[0].Updated, contractAddr)
 	return k.importContractState(ctx, contractAddr, state)
+}
+
+func (k Keeper) hasInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool {
+	return k.wormholeKeeper.HasInstantiateAllowlist(ctx, caller.String(), codeId)
 }
 
 func (k Keeper) newQueryHandler(ctx sdk.Context, contractAddress sdk.AccAddress) QueryHandler {

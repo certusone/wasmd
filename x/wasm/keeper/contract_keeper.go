@@ -31,6 +31,7 @@ type decoratedKeeper interface {
 	Sudo(ctx sdk.Context, contractAddress sdk.AccAddress, msg []byte) ([]byte, error)
 	setContractInfoExtension(ctx sdk.Context, contract sdk.AccAddress, extra types.ContractInfoExtension) error
 	setAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig types.AccessConfig, autz AuthorizationPolicy) error
+	hasInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool
 	ClassicAddressGenerator() AddressGenerator
 }
 
@@ -127,4 +128,8 @@ func (p PermissionedKeeper) SetContractInfoExtension(ctx sdk.Context, contract s
 // SetAccessConfig updates the access config of a code id.
 func (p PermissionedKeeper) SetAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig types.AccessConfig) error {
 	return p.nested.setAccessConfig(ctx, codeID, caller, newConfig, p.authZPolicy)
+}
+
+func (p PermissionedKeeper) HasInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool {
+	return p.nested.hasInstantiateAllowlist(ctx, codeId, caller)
 }

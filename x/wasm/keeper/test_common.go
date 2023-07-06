@@ -385,6 +385,7 @@ func createTestInput(
 		&ibcKeeper.PortKeeper,
 		scopedWasmKeeper,
 		wasmtesting.MockIBCTransferKeeper{},
+		wasmtesting.MockWormholeKeeper{},
 		msgRouter,
 		querier,
 		tempDir,

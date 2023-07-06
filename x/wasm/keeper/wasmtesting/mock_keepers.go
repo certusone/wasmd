@@ -118,3 +118,16 @@ func (m MockIBCTransferKeeper) GetPort(ctx sdk.Context) string {
 	}
 	return m.GetPortFn(ctx)
 }
+
+var _ types.WormholeKeeper = &MockWormholeKeeper{}
+
+type MockWormholeKeeper struct {
+	HasInstantiateAllowlistFn func(ctx sdk.Context, contract string, codeId uint64) bool
+}
+
+func (m MockWormholeKeeper) HasInstantiateAllowlist(ctx sdk.Context, contract string, codeId uint64) bool {
+	if m.HasInstantiateAllowlistFn == nil {
+		panic("not expected to be called")
+	}
+	return m.HasInstantiateAllowlistFn(ctx, contract, codeId)
+}

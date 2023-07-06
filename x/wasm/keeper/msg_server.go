@@ -49,38 +49,43 @@ func (m msgServer) StoreCode(goCtx context.Context, msg *types.MsgStoreCode) (*t
 
 // InstantiateContract instantiate a new contract with classic sequence based address generation
 func (m msgServer) InstantiateContract(goCtx context.Context, msg *types.MsgInstantiateContract) (*types.MsgInstantiateContractResponse, error) {
-	return nil, sdkerrors.Wrapf(sdkerrors.ErrNotSupported, "must use x/wormhole")
-	// if err := msg.ValidateBasic(); err != nil {
-	// 	return nil, err
-	// }
-	// ctx := sdk.UnwrapSDKContext(goCtx)
+	if err := msg.ValidateBasic(); err != nil {
+		return nil, err
+	}
+	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	// senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
-	// if err != nil {
-	// 	return nil, sdkerrors.Wrap(err, "sender")
-	// }
-	// var adminAddr sdk.AccAddress
-	// if msg.Admin != "" {
-	// 	if adminAddr, err = sdk.AccAddressFromBech32(msg.Admin); err != nil {
-	// 		return nil, sdkerrors.Wrap(err, "admin")
-	// 	}
-	// }
+	senderAddr, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, sdkerrors.Wrap(err, "sender")
+	}
 
-	// ctx.EventManager().EmitEvent(sdk.NewEvent(
-	// 	sdk.EventTypeMessage,
-	// 	sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
-	// 	sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
-	// ))
+	// check the x/wormhole instantiate allowlist upfront
+	if !m.keeper.HasInstantiateAllowlist(ctx, msg.CodeID, senderAddr) {
+		return nil, sdkerrors.Wrapf(sdkerrors.ErrNotSupported, "must use x/wormhole")
+	}
 
-	// contractAddr, data, err := m.keeper.Instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	var adminAddr sdk.AccAddress
+	if msg.Admin != "" {
+		if adminAddr, err = sdk.AccAddressFromBech32(msg.Admin); err != nil {
+			return nil, sdkerrors.Wrap(err, "admin")
+		}
+	}
 
-	// return &types.MsgInstantiateContractResponse{
-	// 	Address: contractAddr.String(),
-	// 	Data:    data,
-	// }, nil
+	ctx.EventManager().EmitEvent(sdk.NewEvent(
+		sdk.EventTypeMessage,
+		sdk.NewAttribute(sdk.AttributeKeyModule, types.ModuleName),
+		sdk.NewAttribute(sdk.AttributeKeySender, msg.Sender),
+	))
+
+	contractAddr, data, err := m.keeper.Instantiate(ctx, msg.CodeID, senderAddr, adminAddr, msg.Msg, msg.Label, msg.Funds)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.MsgInstantiateContractResponse{
+		Address: contractAddr.String(),
+		Data:    data,
+	}, nil
 }
 
 // InstantiateContract2 instantiate a new contract with predicatable address generated
