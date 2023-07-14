@@ -78,8 +78,8 @@ type ContractOpsKeeper interface {
 	// SetAccessConfig updates the access config of a code id.
 	SetAccessConfig(ctx sdk.Context, codeID uint64, caller sdk.AccAddress, newConfig AccessConfig) error
 
-	// HasInstantiateAllowlist checks whether there is an entry to allow the sender to directly call the wasm instantiate method
-	HasInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool
+	// HasWasmInstantiateAllowlist checks whether there is an entry to allow the sender to directly call the wasm instantiate method
+	HasWasmInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool
 }
 
 // IBCContractKeeper IBC lifecycle event handler

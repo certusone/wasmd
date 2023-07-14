@@ -1085,8 +1085,8 @@ func (k Keeper) importContract(ctx sdk.Context, contractAddr sdk.AccAddress, c *
 	return k.importContractState(ctx, contractAddr, state)
 }
 
-func (k Keeper) hasInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool {
-	return k.wormholeKeeper.HasInstantiateAllowlist(ctx, caller.String(), codeId)
+func (k Keeper) hasWasmInstantiateAllowlist(ctx sdk.Context, codeId uint64, caller sdk.AccAddress) bool {
+	return k.wormholeKeeper.HasWasmInstantiateAllowlist(ctx, caller.String(), codeId)
 }
 
 func (k Keeper) newQueryHandler(ctx sdk.Context, contractAddress sdk.AccAddress) QueryHandler {

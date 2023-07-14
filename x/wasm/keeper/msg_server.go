@@ -60,7 +60,7 @@ func (m msgServer) InstantiateContract(goCtx context.Context, msg *types.MsgInst
 	}
 
 	// check the x/wormhole instantiate allowlist upfront
-	if !m.keeper.HasInstantiateAllowlist(ctx, msg.CodeID, senderAddr) {
+	if !m.keeper.HasWasmInstantiateAllowlist(ctx, msg.CodeID, senderAddr) {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrNotSupported, "must use x/wormhole")
 	}
 
